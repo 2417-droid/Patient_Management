@@ -4,6 +4,7 @@ package com.pm.patientservice.service;
 import com.pm.patientservice.dto.PatientRequestDTO;
 import com.pm.patientservice.dto.PatientResponseDTO;
 import com.pm.patientservice.grpc.BillingServiceGrpcClient;
+import com.pm.patientservice.kafka.kafkaProducer;
 import com.pm.patientservice.mapper.PatientMapper;
 import com.pm.patientservice.model.Patient;
 import com.pm.patientservice.repository.PatientRepository;
@@ -18,9 +19,12 @@ import java.util.UUID;
 public class PatientService {
     private final PatientRepository patientRepository;
     private final BillingServiceGrpcClient billingServiceGrpcClient;
-    public PatientService(PatientRepository patientRepository , BillingServiceGrpcClient wow) {// it receives the repo
+    private final kafkaProducer kafkaProducer;
+
+    public PatientService(PatientRepository patientRepository , BillingServiceGrpcClient wow, kafkaProducer kafkaProducer) {// it receives the repo
         this.billingServiceGrpcClient = wow;
         this.patientRepository = patientRepository;
+        this.kafkaProducer = kafkaProducer;
     }
     public List<PatientResponseDTO> getPatients(){
         List<Patient> patientList = patientRepository.findAll();
@@ -35,9 +39,11 @@ public class PatientService {
         Patient p = patientRepository.save(PatientMapper.toModel(patientRequestDTO));
         billingServiceGrpcClient.createBillingAccount(p.getPatientId().toString() , p.getName(), p.getEmail());
 
+        kafkaProducer.sendEvent(p);
+
         PatientResponseDTO response = PatientMapper.toDTO(p);
 
-        System.out.println("Service response: " + response);
+//        System.out.println("Service response: " + response);
 
         return response;
     }

@@ -41,11 +41,9 @@ public class PatientService {
 
         kafkaProducer.sendEvent(p);
 
-        PatientResponseDTO response = PatientMapper.toDTO(p);
+        //        System.out.println("Service response: " + response);
 
-//        System.out.println("Service response: " + response);
-
-        return response;
+        return PatientMapper.toDTO(p);
     }
     public PatientResponseDTO updatePatient(PatientRequestDTO patientRequestDTO , UUID id){
         Patient p = patientRepository.findById(id).orElse(null);

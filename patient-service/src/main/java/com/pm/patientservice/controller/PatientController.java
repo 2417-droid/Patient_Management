@@ -9,9 +9,12 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.groups.Default;
+import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.UUID;
@@ -28,10 +31,17 @@ public class PatientController {
 
     @GetMapping
     @Operation(summary = "Get Patients")
-    public ResponseEntity<List<PatientResponseDTO>> getAllPatients() {
-        //response entity is http response object
-        List<PatientResponseDTO> patients = patientService.getPatients();
-        return ResponseEntity.ok().body(patients);
+    public ResponseEntity<Page<PatientResponseDTO>> getAllPatients(
+            @RequestParam(required = false) String search,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        
+        if (page < 0 || size <= 0 || size > 100) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid page or size");
+        }
+        
+        Page<PatientResponseDTO> patientsPage = patientService.getPatients(search, page, size);
+        return ResponseEntity.ok().body(patientsPage);
     }
     @PostMapping
     @Operation(summary = "Create a new Patient")

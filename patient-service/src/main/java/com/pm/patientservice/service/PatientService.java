@@ -8,6 +8,9 @@ import com.pm.patientservice.kafka.kafkaProducer;
 import com.pm.patientservice.mapper.PatientMapper;
 import com.pm.patientservice.model.Patient;
 import com.pm.patientservice.repository.PatientRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -26,11 +29,15 @@ public class PatientService {
         this.patientRepository = patientRepository;
         this.kafkaProducer = kafkaProducer;
     }
-    public List<PatientResponseDTO> getPatients(){
-        List<Patient> patientList = patientRepository.findAll();
-        return patientList.stream().map(
-                PatientMapper::toDTO
-        ).toList();
+    public Page<PatientResponseDTO> getPatients(String search, int page, int size){
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Patient> patientPage;
+        if (search == null || search.trim().isEmpty()) {
+            patientPage = patientRepository.findAll(pageable);
+        } else {
+            patientPage = patientRepository.findByNameContainingIgnoreCaseOrEmailContainingIgnoreCase(search.trim(), search.trim(), pageable);
+        }
+        return patientPage.map(PatientMapper::toDTO);
     }
     public PatientResponseDTO createPatient(PatientRequestDTO patientRequestDTO){
 //        if(patientRepository.existsByEmail(patientRequestDTO.getEmail())) {

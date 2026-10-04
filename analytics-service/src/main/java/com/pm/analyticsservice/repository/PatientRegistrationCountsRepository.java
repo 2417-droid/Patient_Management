@@ -7,7 +7,12 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
-public interface PatientRegistrationCounts extends JpaRepository<PatientRegistrationCounts, Long> {
+public interface PatientRegistrationCountsRepository
+        extends JpaRepository<PatientRegistrationCount, Long> {
+
     Optional<PatientRegistrationCount> findByRegistrationDate(LocalDate date);
-    List<PatientRegistrationCount> findAllByRegistrationDateBetween(LocalDate start, LocalDate end);
+
+    List<PatientRegistrationCount> findAllByRegistrationDateBetween(
+            LocalDate start,
+            LocalDate end);
 }

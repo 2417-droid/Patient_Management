@@ -7,6 +7,8 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import patient.events.PatientEvent;
 
+import java.time.LocalDate;
+
 @Service
 public class kafkaProducer {
     private static final Logger log = LoggerFactory.getLogger(kafkaProducer.class);
@@ -19,6 +21,7 @@ public class kafkaProducer {
                 .setId(patient.getPatientId().toString())
                 .setName(patient.getName())
                 .setEmail(patient.getEmail())
+                .setRegisteredDate(patient.getRegisteredDate().toString())
                 .setEventType("Patient_Created")
                 .build();
 

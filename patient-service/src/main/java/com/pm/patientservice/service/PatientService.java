@@ -11,7 +11,10 @@ import com.pm.patientservice.repository.PatientRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -64,7 +67,19 @@ public class PatientService {
         Patient updated = patientRepository.save(p);
         return PatientMapper.toDTO(updated);
     }
-    public void deletePatient(UUID id){
+    @Transactional
+    public void deletePatient(UUID id) {
+        // Verify the patient exists before deleting.
+        // deleteById() would silently do nothing on a missing ID;
+        // we explicitly throw 404 so the event is never published for non-existent patients.
+        if (!patientRepository.existsById(id)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Patient not found: " + id);
+        }
+
         patientRepository.deleteById(id);
+
+        // Only reached if the delete above succeeded.
+        // Billing-service will consume this and soft-delete the associated BillingAccount.
+        kafkaProducer.sendDeleteEvent(id);
     }
 }

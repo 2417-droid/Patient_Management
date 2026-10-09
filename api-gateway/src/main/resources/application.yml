@@ -6,6 +6,24 @@ spring:
     gateway:
       server:
         webflux:
+
+          globalcors:
+            add-to-simple-url-handler-mapping: true
+            cors-configurations:
+              '[/**]':
+                allowedOrigins:
+                  - "http://localhost:5173"
+                allowedMethods:
+                  - GET
+                  - POST
+                  - PUT
+                  - PATCH
+                  - DELETE
+                  - OPTIONS
+                allowedHeaders:
+                  - "*"
+                allowCredentials: true
+
           routes:
             - id: patient-service-route
               uri: http://patient-service:4000
@@ -44,3 +62,7 @@ spring:
               filters:
                 - StripPrefix=1
                 - JwtValidation
+
+auth:
+  service:
+    url: ${AUTH_SERVICE_URL:http://auth-service:4005}

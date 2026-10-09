@@ -1,5 +1,6 @@
 package com.pm.authservice.util;
 
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
@@ -7,16 +8,13 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
-import java.nio.charset.StandardCharsets;
-import java.security.Key;
-import java.security.SignatureException;
 import java.util.Base64;
 import java.util.Date;
 
 @Component
 public class JwtUtil {
 
-    private final Key secretKey;
+    private final SecretKey secretKey;
 
     public JwtUtil(@Value("${jwt.secret}") String secret) {
         byte[] keyBytes = Base64.getDecoder().decode(secret);
@@ -25,7 +23,6 @@ public class JwtUtil {
 
     public String generateToken(String email, String role) {
         long now = System.currentTimeMillis();
-
         return Jwts.builder()
                 .subject(email)
                 .claim("role", role)
@@ -34,11 +31,18 @@ public class JwtUtil {
                 .signWith(secretKey)
                 .compact();
     }
-    public void validate(String token){
+
+    public void validate(String token) {
         try {
-            Jwts.parser().verifyWith((SecretKey) secretKey)
-                    .build().parseClaimsJws(token);
-        } catch (JwtException e){
+            Claims claims = Jwts.parser()
+                    .verifyWith(secretKey)
+                    .build()
+                    .parseSignedClaims(token)
+                    .getPayload();
+            if (claims.getExpiration().before(new Date())) {
+                throw new JwtException("Token has expired");
+            }
+        } catch (JwtException e) {
             throw new JwtException(e.getMessage());
         }
     }

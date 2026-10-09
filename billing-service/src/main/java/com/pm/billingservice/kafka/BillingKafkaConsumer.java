@@ -34,7 +34,7 @@ public class BillingKafkaConsumer {
                 return;
             }
 
-            String patientIdStr = patientEvent.getId();
+            String patientIdStr = patientEvent.getPatientId();
 
             // Validate the ID is non-empty before parsing
             if (patientIdStr == null || patientIdStr.isBlank()) {

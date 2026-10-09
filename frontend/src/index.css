@@ -1,0 +1,112 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #533afd;
+  --color-primary-deep: #4434d4;
+  --color-primary-press: #2e2b8c;
+  --color-primary-soft: #665efd;
+  --color-primary-bg-subdued-hover: #b9b9f9;
+
+  --color-brand-dark-900: #1c1e54;
+
+  --color-ink: #0d253d;
+  --color-ink-secondary: #273951;
+  --color-ink-mute: #64748d;
+  --color-ink-mute-2: #61718a;
+
+  --color-on-primary: #ffffff;
+
+  --color-canvas: #ffffff;
+  --color-canvas-soft: #f6f9fc;
+  --color-canvas-cream: #f5e9d4;
+
+  --color-hairline: #e3e8ee;
+  --color-hairline-input: #a8c3de;
+
+  --color-accent-ruby: #ea2261;
+  --color-accent-magenta: #f96bee;
+  --color-accent-lemon: #9b6829;
+  --color-accent-shadow-blue: #003770;
+
+  --shadow-level-1: 0 1px 3px rgba(0, 55, 112, 0.08);
+  --shadow-level-2: 0 8px 24px rgba(0, 55, 112, 0.08), 0 2px 6px rgba(0, 55, 112, 0.04);
+}
+
+@layer base {
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+    color: var(--color-ink);
+    background-color: var(--color-canvas);
+    font-feature-settings: "ss01";
+    font-weight: 300;
+  }
+}
+
+@layer components {
+  /* Reusable DESIGN.md Components */
+  
+  .btn-primary {
+    @apply bg-primary text-on-primary rounded-full px-4 py-2 text-[16px] font-normal leading-none shadow-level-1 hover:bg-primary-deep active:bg-primary-press transition-colors;
+  }
+
+  .btn-secondary {
+    @apply bg-canvas text-primary rounded-full px-4 py-2 text-[16px] font-normal leading-none border border-primary hover:bg-canvas-soft transition-colors;
+  }
+
+  .text-input {
+    @apply bg-canvas text-ink text-[15px] font-light px-3 py-2 rounded-md border border-hairline-input focus:border-primary focus:outline-none transition-colors w-full;
+  }
+
+  .card-light {
+    @apply bg-canvas text-ink p-8 rounded-xl border border-hairline shadow-level-1;
+  }
+  
+  .card-cream {
+    @apply bg-canvas-cream text-ink p-8 rounded-xl shadow-level-1;
+  }
+  
+  .tabular-nums {
+    font-feature-settings: "tnum", "ss01";
+    letter-spacing: -0.42px;
+  }
+  
+  .display-lg {
+    @apply text-[32px] font-light leading-tight tracking-[calc(-0.64px)];
+  }
+  
+  .display-md {
+    @apply text-[26px] font-light leading-tight tracking-[calc(-0.26px)];
+  }
+  
+  .heading-lg {
+    @apply text-[22px] font-light leading-tight tracking-[calc(-0.22px)];
+  }
+  
+  .heading-md {
+    @apply text-[20px] font-light leading-tight tracking-[calc(-0.20px)];
+  }
+
+  .heading-sm {
+    @apply text-[18px] font-light leading-tight;
+  }
+}
+
+/* Atmospheric Gradient Mesh */
+.gradient-mesh {
+  background-image: 
+    radial-gradient(at 0% 0%, hsla(253, 98%, 60%, 1) 0px, transparent 50%),
+    radial-gradient(at 50% 0%, hsla(328, 86%, 55%, 1) 0px, transparent 50%),
+    radial-gradient(at 100% 0%, hsla(38, 58%, 38%, 1) 0px, transparent 50%),
+    radial-gradient(at 0% 100%, hsla(253, 98%, 60%, 1) 0px, transparent 50%);
+  background-size: cover;
+  background-position: center;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 40vh;
+  z-index: -1;
+  opacity: 0.8;
+  filter: blur(80px);
+}

@@ -1,13 +1,9 @@
 package com.pm.patientservice.service;
 
 
-import com.pm.patientservice.dto.PatientRequestDTO;
-import com.pm.patientservice.dto.PatientResponseDTO;
-import com.pm.patientservice.grpc.BillingServiceGrpcClient;
-import com.pm.patientservice.kafka.kafkaProducer;
-import com.pm.patientservice.mapper.PatientMapper;
-import com.pm.patientservice.model.Patient;
-import com.pm.patientservice.repository.PatientRepository;
+import java.time.LocalDate;
+import java.util.UUID;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -16,10 +12,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import com.pm.patientservice.dto.PatientRequestDTO;
+import com.pm.patientservice.dto.PatientResponseDTO;
+import com.pm.patientservice.grpc.BillingServiceGrpcClient;
+import com.pm.patientservice.kafka.kafkaProducer;
+import com.pm.patientservice.mapper.PatientMapper;
+import com.pm.patientservice.model.Patient;
+import com.pm.patientservice.repository.PatientRepository;
 
 @Service
 public class PatientService {
@@ -43,10 +42,11 @@ public class PatientService {
         return patientPage.map(PatientMapper::toDTO);
     }
     public PatientResponseDTO createPatient(PatientRequestDTO patientRequestDTO){
-//        if(patientRepository.existsByEmail(patientRequestDTO.getEmail())) {
-//            return null;
-//        }
-        Patient p = patientRepository.save(PatientMapper.toModel(patientRequestDTO));
+        //if(patientRepository.existsByEmail(patientRequestDTO.getEmail())) {
+        // return null;
+        //}
+        Patient patient = PatientMapper.toModel(patientRequestDTO);
+        Patient p = patientRepository.saveAndFlush(patient);
         billingServiceGrpcClient.createBillingAccount(p.getPatientId().toString() , p.getName(), p.getEmail());
 
         kafkaProducer.sendEvent(p);
